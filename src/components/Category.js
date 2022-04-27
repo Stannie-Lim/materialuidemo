@@ -1,23 +1,33 @@
 import React from 'react';
 import axios from 'axios';
 
-export class Products extends React.Component {
+export class Category extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: [],
+      category: null,
     };
   }
 
   async componentDidMount() {
+    const { categoryName } = this.props.match.params;
     this.setState({
-      products: (await axios.get('/api/products')).data,
+      category: (await axios.get(`/api/${categoryName}/products`)).data,
     });
   }
 
+
+  async componentDidUpdate(prevProps) {
+    const { categoryName } = this.props.match.params;
+    if (prevProps.match.params.categoryName !== categoryName) {
+      this.setState({
+        category: (await axios.get(`/api/${categoryName}/products`)).data,
+      });
+    }
+  }
+
   render() {
-    const { products } = this.state;
-console.log(products);
+    const products = this.state.category?.products || [];
     return (
       <>
         <ul>

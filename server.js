@@ -25,8 +25,8 @@ const syncAndSeed = async() => {
     await db.sync({ force: true });
 
     const categories = await Promise.all(
-      Array(3).fill().map(() => Category.create({
-        name: faker.commerce.department(),
+      Array(5).fill().map(() => Category.create({
+        name: faker.commerce.department().toLowerCase(),
       }))
     );
 
@@ -53,7 +53,7 @@ app.use('/dist', express.static(path.join(__dirname, 'dist')));
 app.get('/', (_, res)=> res.sendFile(path.join(__dirname, 'index.html')));
 
 app.get('/api/categories', async (_, res) => res.send(await Category.findAll({ include: Product })));
-app.get('/api/products', async (_, res) => res.send(await Product.findAll({ include: Category })));
+app.get('/api/:categoryName/products', async (req, res) => res.send(await Category.findOne({ where: { name: req.params.categoryName }, include: Product })));
 
 app.post('/api/products', async ({ body: { name, imageUrl, description, rating, price, categoryId } }, res) => res.send(await Product.create(({ name, imageUrl, description, rating, price, categoryId }))));
 
